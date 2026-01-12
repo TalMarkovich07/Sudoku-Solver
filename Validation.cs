@@ -19,15 +19,32 @@ namespace Sudoku_Solver
         {
             for (int i = 0; i < this.mat.GetLength(0); i++)
                 if (this.mat[row][i] == num)
-                    return false;
-            return true;
+                    return true;
+            return false;
         }
         private bool inCol(int num, int col)
         {
             for (int i = 0; i < this.mat[1].GetLength(1); i++)
-                if (this.mat[i][col] == num))
-                        return false;
-            return true;
+                if (this.mat[i][col] == num)
+                        return true;
+            return false;
+        }
+        private bool inSquare(int num, int row, int col)
+        {
+            int root = (int)Math.Sqrt(size);
+            int startRow = (int)(row / root) * root;
+            int startCol = (int)(col / root) * root;
+            for(int i = startRow; i < startRow + root; i++)
+                for(int j = startCol; j < startCol + root; j++)
+                    if(this.mat[i][j] == num)
+                        return true;
+
+            return false;
+        }
+
+        public bool Validate(int num, int row, int col)
+        {
+            return !inRow(num, row)&&!inCol(num, col)&&!inSquare(num, row, col);
         }
 
 
