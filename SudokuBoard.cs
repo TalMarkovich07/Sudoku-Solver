@@ -9,6 +9,7 @@ namespace Sudoku_Solver
     internal class SudokuBoard
     {
         public static int MatSize = 9;
+        public static int BoxSize = (int)Math.Sqrt(MatSize);
         private int[,] mat;
 
         private int CharToNum(char c)

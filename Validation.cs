@@ -8,45 +8,43 @@ namespace Sudoku_Solver
 {
     internal class Validation
     {
-        private int size = Program.MaxSize;
-        private int[][] mat;
+        private int[] RowMasks;
+        private int[] ColMasks;
+        private int[] BoxMasks;
 
-        public Validation(int[][] board)
+        public Validation(int[,] mat)
         {
-            this.mat = board;
-        }
-        private bool inRow(int num, int row)
-        {
-            for (int i = 0; i < this.mat.GetLength(0); i++)
-                if (this.mat[row][i] == num)
-                    return true;
-            return false;
-        }
-        private bool inCol(int num, int col)
-        {
-            for (int i = 0; i < this.mat[1].GetLength(1); i++)
-                if (this.mat[i][col] == num)
-                        return true;
-            return false;
-        }
-        private bool inSquare(int num, int row, int col)
-        {
-            int root = (int)Math.Sqrt(size);
-            int startRow = (int)(row / root) * root;
-            int startCol = (int)(col / root) * root;
-            for(int i = startRow; i < startRow + root; i++)
-                for(int j = startCol; j < startCol + root; j++)
-                    if(this.mat[i][j] == num)
-                        return true;
+            int size = SudokuBoard.MatSize;
+            int boxSize = SudokuBoard.BoxSize;
+            RowMasks = new int[size];
+            ColMasks = new int[size];
+            BoxMasks = new int[size];
+            for (int row = 0; row < SudokuBoard.MatSize; row++)
+            {
+                for (int col = 0; col < SudokuBoard.MatSize; col++)
+                {
+                    int val = mat[row, col];
+                    if (val > 0)
+                    {
+                        int mask = 1;
+                        int boxIdx = (row / boxSize) * boxSize + (col / boxSize);
 
-            return false;
+                        if ((RowMasks[row] & mask) != 0)
+                            throw new SudokuExceptions($"Duplicate {val} in row {row}");
+
+                        if ((ColMasks[col] & mask) != 0)
+                            throw new SudokuExceptions($"Duplicate {val} in column {col}");
+
+                        if ((BoxMasks[boxIdx] & mask) != 0)
+                            throw new SudokuExceptions($"Duplicate {val} in box {boxIdx}");
+
+                        RowMasks[row] |= mask;
+                        ColMasks[col] |= mask;
+                        BoxMasks[boxIdx] |= mask;
+                    }
+                }
+            }
+
         }
-
-        public bool Validate(int num, int row, int col)
-        {
-            return !inRow(num, row)&&!inCol(num, col)&&!inSquare(num, row, col);
-        }
-
-
     }
 }
