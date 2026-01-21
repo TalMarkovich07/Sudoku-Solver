@@ -15,6 +15,6 @@ namespace Sudoku_Solver
     }
     public class WrongLengthException : SudokuExceptions 
     {
-        public WrongLengthException() : base($"Board dimensions must be {Program.MaxSize}x{Program.MaxSize}!") { }   
+        public WrongLengthException() : base($"Board dimensions must be {SudokuBoard.MatSize}x{Program.MaxSize}!") { }   
     }
 }
