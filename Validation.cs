@@ -26,7 +26,7 @@ namespace Sudoku_Solver
                     int val = mat[row, col];
                     if (val > 0)
                     {
-                        int mask = 1;
+                        int mask = 1 << (val -1);
                         int boxIdx = (row / boxSize) * boxSize + (col / boxSize);
 
                         if ((RowMasks[row] & mask) != 0)
@@ -45,6 +45,32 @@ namespace Sudoku_Solver
                 }
             }
 
+        }
+        public bool IsValid(int row, int col, int num)
+        {
+            // if num is in the given row, or in the given column, or given box, return false. else return true
+            int mask = 1 << (num -1);
+            int boxIdx = (row / SudokuBoard.BoxSize) * SudokuBoard.BoxSize + (col / SudokuBoard.BoxSize);
+            if (((RowMasks[row] & mask) != 0) || ((ColMasks[col] & mask) != 0) || ((BoxMasks[boxIdx] & mask) != 0))
+                return false;
+            return true;
+        }
+        public void UpdateValid(int row, int col, int num)
+        {
+            int mask = 1 << (num - 1);
+            int boxIdx = (row / SudokuBoard.BoxSize) * SudokuBoard.BoxSize + (col / SudokuBoard.BoxSize);
+            RowMasks[row] |= mask;
+            ColMasks[col] |= mask;
+            BoxMasks[boxIdx] |= mask;
+        }
+        public void ClearValid(int row, int col, int lastNum)
+        {
+            int mask = 1 << (lastNum - 1);
+            int boxIdx = (row / SudokuBoard.BoxSize) * SudokuBoard.BoxSize + (col / SudokuBoard.BoxSize);
+
+            RowMasks[row] &= ~mask;
+            ColMasks[col] &= ~mask;
+            BoxMasks[boxIdx] &= ~mask;
         }
     }
 }

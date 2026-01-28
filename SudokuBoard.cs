@@ -10,7 +10,7 @@ namespace Sudoku_Solver
     {
         public static int MatSize = 9;
         public static int BoxSize = (int)Math.Sqrt(MatSize);
-        private int[,] mat;
+        public int[,] mat;
 
         private int CharToNum(char c)
         {
@@ -48,6 +48,10 @@ namespace Sudoku_Solver
                 }
                 Console.WriteLine();
             }
+        }
+        public void UpdateBoard(int row, int col, int num)
+        {
+            mat[row, col] = num;   
         }
     }
 }
