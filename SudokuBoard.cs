@@ -34,5 +34,9 @@ namespace Sudoku_Solver
                 for (int col = 0; col < MatSize; col++)
                     mat[row, col] = CharToNum(input[MatSize*row + col]);
         }
+        public void ShowBoard()
+        {
+
+        }
     }
 }
