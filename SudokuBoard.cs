@@ -34,9 +34,20 @@ namespace Sudoku_Solver
                 for (int col = 0; col < MatSize; col++)
                     mat[row, col] = CharToNum(input[MatSize*row + col]);
         }
-        public void ShowBoard()
+        public void PrintBoard()
         {
-
+            for(int row= 0; row < MatSize; row++)
+            {
+                if (row > 0 && row%BoxSize==0)
+                    Console.WriteLine(new string('-', MatSize*4));
+                for(int col = 0; col < MatSize; col++)
+                {
+                    if (col > 0 && col % BoxSize == 0)
+                        Console.Write("| ");
+                    Console.Write(mat[row, col].ToString().PadRight(3));
+                }
+                Console.WriteLine();
+            }
         }
     }
 }
