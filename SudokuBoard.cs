@@ -11,6 +11,7 @@ namespace Sudoku_Solver
         public static int MatSize = 9;
         public static int BoxSize = (int)Math.Sqrt(MatSize);
         public int[,] mat;
+        public int[,] fails;
 
         private int CharToNum(char c)
         {
@@ -28,6 +29,7 @@ namespace Sudoku_Solver
         public SudokuBoard(string input) 
         {
             mat = new int[MatSize, MatSize];
+            fails = new int[MatSize, MatSize];
             if (input.Length != Math.Pow(MatSize, 2))
                 throw new WrongLengthException();
             for (int row = 0; row < MatSize; row++)

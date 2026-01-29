@@ -40,6 +40,12 @@ namespace Sudoku_Solver
                     if (board.mat[row, col] == 0)
                     {
                         int options = valid.CountOptions(row, col);
+                        if (options == minOption && board.fails[row, col] > board.fails[minRow, minCol])
+                        // if there are two cells with the same amount of options - choose the one that failed more
+                        {
+                            minRow = row;
+                            minCol = col;
+                        }
                         if (options < minOption)
                         {
                             minOption = options;
@@ -89,6 +95,7 @@ namespace Sudoku_Solver
                     }
 
                 }
+                board.fails[row, col]++;
                 return false;
 
             }
