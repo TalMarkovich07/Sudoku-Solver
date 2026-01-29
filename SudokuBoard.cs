@@ -53,5 +53,13 @@ namespace Sudoku_Solver
         {
             mat[row, col] = num;   
         }
+        public bool BoardSolved()
+        {
+            for (int row = 0; row < MatSize; row++)
+                for (int col = 0; col < MatSize; col++)
+                    if (mat[row, col] == 0)
+                        return false;
+            return true;
+        }
     }
 }

@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Numerics;
+using System.Runtime.InteropServices;
 
 namespace Sudoku_Solver
 {
@@ -54,6 +56,22 @@ namespace Sudoku_Solver
             if (((RowMasks[row] & mask) != 0) || ((ColMasks[col] & mask) != 0) || ((BoxMasks[boxIdx] & mask) != 0))
                 return false;
             return true;
+        }
+        
+        public int CountOptions(int row, int col)
+        {
+            int boxIdx = (row / SudokuBoard.BoxSize) * SudokuBoard.BoxSize + (col / SudokuBoard.BoxSize);
+            int blocked = RowMasks[row] | ColMasks[col] | BoxMasks[boxIdx];
+            int fullMask = (1 << SudokuBoard.MatSize) - 1;
+            int available = ~blocked & fullMask;
+            int temp = available;
+            int count = 0;
+            while (temp > 0)
+            {
+                temp &= (temp - 1);
+                count++;
+            }
+            return count;
         }
         public void UpdateValid(int row, int col, int num)
         {

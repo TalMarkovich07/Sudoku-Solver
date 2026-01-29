@@ -29,6 +29,29 @@ namespace Sudoku_Solver
                 valid.UpdateValid(row, col, num);
             }
         }
+        public (int, int) MinRemainValues()
+        {
+            int minOption = SudokuBoard.MatSize;
+            int minRow = -1;
+            int minCol = -1;
+            for (int row = 0; row < SudokuBoard.MatSize; row++)
+                for (int col = 0; col < SudokuBoard.MatSize; col++)
+                {
+                    if (board.mat[row, col] == 0)
+                    {
+                        int options = valid.CountOptions(row, col);
+                        if (options < minOption)
+                        {
+                            minOption = options;
+                            minRow = row;
+                            minCol = col;
+                        }
+
+                    }
+
+                }
+            return (minRow, minCol);
+        }
         public void Solve()
         {
             var watch = System.Diagnostics.Stopwatch.StartNew();
@@ -36,7 +59,7 @@ namespace Sudoku_Solver
             if (RecursionSolve(0, 0))
             {
                 watch.Stop();
-                Console.WriteLine($"Solved in: {watch.Elapsed.TotalMilliseconds}ms");
+                Console.WriteLine($"\nSolved in: {watch.Elapsed.TotalMilliseconds}ms");
             }
             else
                 throw new SudokuExceptions("Given board is un-solvable");
@@ -44,13 +67,14 @@ namespace Sudoku_Solver
         private bool RecursionSolve(int row, int col)
         {
             iterations++;
-            if (row == SudokuBoard.MatSize)
-                return true;
-            if (col == SudokuBoard.MatSize)
-                return RecursionSolve(row + 1, 0);
-
+            if (row == -1)
+                return board.BoardSolved();
+            int x, y;
             if (board.mat[row, col] != 0)
-                return RecursionSolve(row, col + 1);
+            {
+                (x, y) = MinRemainValues();
+                return RecursionSolve(x, y);
+            }
             else
             {
                 for (int i = 1; i <= SudokuBoard.MatSize; i++)
@@ -58,7 +82,8 @@ namespace Sudoku_Solver
                     if (valid.IsValid(row, col, i))
                     {
                         UpdateSolver(row, col, i);
-                        if (RecursionSolve(row, col + 1))
+                        (x,y) = MinRemainValues();
+                        if (RecursionSolve(x, y))
                             return true;
                         UpdateSolver(row, col, 0, i);
                     }
