@@ -95,15 +95,10 @@ namespace Sudoku_Solver
                             return true;
                         UpdateSolver(row, col, 0, i);
                     }
-
                 }
                 board.fails[row, col]++;
                 return false;
 
             }
-
-
         }
-        
     }
-}
