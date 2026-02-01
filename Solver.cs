@@ -11,6 +11,7 @@ namespace Sudoku_Solver
         public int iterations = 0;
         public SudokuBoard board;
         public Validation valid;
+        public long SolveTimeMs { get; private set; }
         public Solver(string input)
         {
             this.board = new SudokuBoard(input);
@@ -65,7 +66,8 @@ namespace Sudoku_Solver
             if (RecursionSolve(0, 0))
             {
                 watch.Stop();
-                Console.WriteLine($"\nSolved in: {watch.Elapsed.TotalMilliseconds}ms");
+                SolveTimeMs = watch.ElapsedMilliseconds;
+                //Console.WriteLine($"Solved in: {watch.Elapsed.TotalMilliseconds}ms, and {iterations} iterations.");
             }
             else
                 throw new SudokuExceptions("Given board is un-solvable");
