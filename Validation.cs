@@ -73,6 +73,23 @@ namespace Sudoku_Solver
             }
             return count;
         }
+        public int GetAvailableMask(int row, int col) // returns a mask of the available numbers in given cell
+        {
+            int boxIdx = (row / SudokuBoard.BoxSize) * SudokuBoard.BoxSize + (col / SudokuBoard.BoxSize);
+            int blocked = RowMasks[row] | ColMasks[col] | BoxMasks[boxIdx];
+            int fullMask = (1 << SudokuBoard.MatSize) - 1;
+            return ~blocked & fullMask;
+        }
+        public int CountOnes(int mask) // count amount of 1 bits in a mask
+        {
+            int count = 0;
+            while(mask > 0)
+            {
+                mask &= (mask - 1);
+                count++;
+            }
+            return count;
+        }
         public void UpdateValid(int row, int col, int num)
         {
             int mask = 1 << (num - 1);

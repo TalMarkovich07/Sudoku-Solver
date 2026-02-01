@@ -10,6 +10,7 @@ namespace Sudoku_Solver
     {
         public static int MatSize = 9;
         public static int BoxSize = (int)Math.Sqrt(MatSize);
+        public Validation valid;
         public int[,] mat;
         public int[,] fails;
 
@@ -35,6 +36,7 @@ namespace Sudoku_Solver
             for (int row = 0; row < MatSize; row++)
                 for (int col = 0; col < MatSize; col++)
                     mat[row, col] = CharToNum(input[MatSize*row + col]);
+            this.valid = new Validation(mat);
         }
         public void PrintBoard()
         {
@@ -63,5 +65,6 @@ namespace Sudoku_Solver
                         return false;
             return true;
         }
+        
     }
 }
