@@ -13,6 +13,10 @@ namespace Sudoku_Solver
         public SudokuExceptions(string message) : base(message) { }
 
     }
+    public class UnsolvableBoardException : SudokuExceptions
+    {
+        public UnsolvableBoardException() : base("Given board is unsolvable") { }
+    }
     public class WrongLengthException : SudokuExceptions 
     {
         public WrongLengthException() : base($"Board dimensions must be {SudokuBoard.MatSize}x{SudokuBoard.MatSize}!") { }   

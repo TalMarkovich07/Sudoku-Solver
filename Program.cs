@@ -9,16 +9,23 @@ namespace Sudoku_Solver
 
     internal class Program
     {
-        public static string Input = "000000010400000000020000000000050407008000300001090000300400200050100000000806000";
+        public static string Input = "000060080020000000001000000070000102500030000000000400004201000300700600000000050";
         static void Main(string[] args)
         {
-            RunTests tests = new RunTests();
-            tests.Run();
-            /*Solver solver = new Solver(Input);
-            solver.board.PrintBoard();
-            solver.Solve();
-            solver.board.PrintBoard();
-            Console.WriteLine($"{solver.iterations} iterations");*/
+            try
+            {
+                RunTests tests = new RunTests();
+                tests.Run();
+                /*Solver solver = new Solver(Input);
+                solver.board.PrintBoard();
+                solver.Solve();
+                solver.board.PrintBoard();
+                Console.WriteLine($"{solver.SolveTimeMs} milliseconds");*/
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Sudoku exception: {ex}");
+            }
         }
     }
 }

@@ -15,56 +15,9 @@ namespace Sudoku_Solver
         {
             this.board = new SudokuBoard(input);
         }
-        private void UpdateSolver(int row, int col, int num, int numToClear = 0)
-        {
-            if (num == 0)
-            {
-                board.valid.ClearValid(row, col, numToClear);
-                board.UpdateBoard(row, col, 0);
-            }
-            else
-            {
-                board.UpdateBoard(row, col, num);
-                board.valid.UpdateValid(row, col, num);
-            }
-        }
-        public (int, int) MinRemainValues()
-        {
-            int minOption = SudokuBoard.MatSize;
-            int minRow = -1;
-            int minCol = -1;
-            for (int row = 0; row < SudokuBoard.MatSize; row++)
-                for (int col = 0; col < SudokuBoard.MatSize; col++)
-                {
-                    if (board.mat[row, col] == 0)
-                    {
-                        int options = board.valid.CountOptions(row, col);
-                        if (options == 1)
-                            return (row, col);
-                        if (options == 0)
-                            throw new SudokuExceptions("Unsolvable from this route");
-                        if (options == minOption && board.fails[row, col] > board.fails[minRow, minCol])
-                        // if there are two cells with the same amount of options - choose the one that failed more
-                        {
-                            minRow = row;
-                            minCol = col;
-                        }
-                        if (options < minOption)
-                        {
-                            minOption = options;
-                            minRow = row;
-                            minCol = col;
-                        }
-
-                    }
-
-                }
-            return (minRow, minCol);
-        }
         public void Solve()
         {
             var watch = System.Diagnostics.Stopwatch.StartNew();
-            FillNakedSingles();
             if (RecursionSolve())
             {
                 watch.Stop();
@@ -74,8 +27,54 @@ namespace Sudoku_Solver
             else
                 throw new SudokuExceptions("Given board is un-solvable");
         }
+        private void ProcessSingles(Queue<(int, int, int)> changesQ)
+        {
+            bool changed = true;
+            while (changed)
+            {
+                changed = false;
+
+                bool nakedFound = true;
+                while (nakedFound)
+                {
+                    nakedFound = false;
+                    for (int r = 0; r < SudokuBoard.MatSize; r++)
+                    {
+                        for (int c = 0; c < SudokuBoard.MatSize; c++)
+                        {
+                            if (board.mat[r, c] == 0)
+                            {
+                                int mask = board.valid.GetAvailableMask(r, c);
+                                int count = board.valid.CountOnes(mask);
+                                if (count == 0)
+                                {
+                                    UndoQ(changesQ);
+                                    throw new SudokuExceptions();
+                                }
+                                if (count == 1)
+                                {
+                                    int val = GetValueFromMask(mask);
+                                    UpdateSolver(r, c, val);
+                                    changesQ.Enqueue((r, c, val));
+                                    nakedFound = true;
+                                    changed = true;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if (HiddenSingles(changesQ)) changed = true;
+            }
+        }
         private bool RecursionSolve()
         {
+            Queue<(int, int, int)> localQ = new Queue<(int, int, int)> ();
+            try
+            {
+                ProcessSingles(localQ);
+            } catch (SudokuExceptions)
+            { return false; }
             iterations++;
             int row = -1;
             int col = -1;
@@ -118,33 +117,57 @@ namespace Sudoku_Solver
                     UpdateSolver(row, col, 0, i);
                 }
             }
+            UndoQ(localQ);
             board.fails[row, col]++;
             return false;
 
         }
-        public void FillNakedSingles()
+        private void UndoQ(Queue<(int, int, int)> Q)
         {
-            bool changed = true;
-            int fullMask = (1 << SudokuBoard.MatSize) - 1;
-            while (changed)
+            int row, col, index;
+            while (Q.Count > 0)
             {
-                changed = false;
-                for (int row = 0; row < SudokuBoard.MatSize; row++)
-                    for (int col = 0; col < SudokuBoard.MatSize; col++)
-                    {
-                        if (board.mat[row, col] == 0)
-                        {
-                            int mask = board.valid.GetAvailableMask(row, col);
-                            if (board.valid.CountOnes(mask) == 1)
-                            {
-                                int value = GetValueFromMask(mask);
-                                UpdateSolver(row, col, value);
-                                changed = true;
-                            }
-
-                        }
-                    }
+                (row, col, index) = Q.Dequeue();
+                UpdateSolver(row, col, 0, index);
             }
+        }
+        private void UpdateSolver(int row, int col, int num, int numToClear = 0)
+        {
+            if (num == 0)
+            {
+                board.valid.ClearValid(row, col, numToClear);
+                board.UpdateBoard(row, col, 0);
+            }
+            else
+            {
+                board.UpdateBoard(row, col, num);
+                board.valid.UpdateValid(row, col, num);
+            }
+        }
+
+
+        public bool NakedSingles()
+        {
+            bool changed = false;
+            int fullMask = (1 << SudokuBoard.MatSize) - 1;
+            for (int row = 0; row < SudokuBoard.MatSize; row++)
+                for (int col = 0; col < SudokuBoard.MatSize; col++)
+                {
+                    if (board.mat[row, col] == 0)
+                    {
+                        int mask = board.valid.GetAvailableMask(row, col);
+                        int count = board.valid.CountOnes(mask);
+                        if (count == 0) return false;
+                        if (count == 1)
+                        {
+                            int value = GetValueFromMask(mask);
+                            UpdateSolver(row, col, value);
+                            changed = true;
+                        }
+
+                    }
+                }
+            return true;
         }
         private int GetValueFromMask(int mask)
         {
@@ -155,6 +178,55 @@ namespace Sudoku_Solver
                 val++;
             }
             return val;
+        }
+
+        private bool CellHiddenSingles(int cellId, int choose, Queue<(int, int, int)> changesQ) // choose: 1 - row, 2- col, other - box
+        {
+            bool changed = false;
+            for (int num = 1; num <= SudokuBoard.MatSize; num++)
+            {
+                int numMask = 1 << (num - 1);
+                int count = 0;
+                int lastRow = -1, lastCol = -1;
+
+                for (int i = 0; i < SudokuBoard.MatSize; i++)
+                {
+                    int row, col;
+                    if (choose == 1) { row = cellId; col = i; }
+                    else if (choose == 2) { row = i; col = cellId; }
+                    else
+                    {
+                        row = (cellId / SudokuBoard.BoxSize) * SudokuBoard.BoxSize + (i / SudokuBoard.BoxSize);
+                        col = (cellId % SudokuBoard.BoxSize) * SudokuBoard.BoxSize + (i % SudokuBoard.BoxSize);
+                    }
+                    if (board.mat[row, col] == 0 && (board.valid.GetAvailableMask(row, col) & numMask) != 0)
+                    {
+                        count++;
+                        lastRow = row;
+                        lastCol = col;
+                    }
+                    if (count > 1) break;
+
+                }
+                if (count == 1)
+                {
+                    changesQ.Enqueue((lastRow, lastCol, num));
+                    UpdateSolver(lastRow, lastCol, num);
+                    changed = true;
+                }
+            }
+            return changed;
+        }
+        public bool HiddenSingles(Queue<(int, int, int)> q)
+        {
+            bool changed = false;
+            for(int i = 0; i < SudokuBoard.MatSize; i++)
+            {
+                changed |= CellHiddenSingles(i, 1, q);
+                changed |= CellHiddenSingles(i, 2, q);
+                changed |= CellHiddenSingles(i, 3, q);
+            }
+            return changed;
         }
     }
 }

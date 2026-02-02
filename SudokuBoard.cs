@@ -42,16 +42,22 @@ namespace Sudoku_Solver
         {
             for(int row= 0; row < MatSize; row++)
             {
+                Console.WriteLine(new string('-', (int)(MatSize * 4.5)));
                 if (row > 0 && row%BoxSize==0)
-                    Console.WriteLine(new string('-', MatSize*4));
+                    Console.WriteLine(new string('-', (int)(MatSize * 4.5)));
                 for(int col = 0; col < MatSize; col++)
                 {
+                    Console.Write("|");
                     if (col > 0 && col % BoxSize == 0)
-                        Console.Write("| ");
-                    Console.Write(mat[row, col].ToString().PadRight(3));
+                        Console.Write(" |");
+                    if (mat[row, col] == 0)
+                        Console.Write(" ".PadRight(3));
+                    else
+                        Console.Write(mat[row, col].ToString().PadRight(3));
                 }
                 Console.WriteLine();
             }
+            Console.WriteLine("\n");
         }
         public void UpdateBoard(int row, int col, int num)
         {
