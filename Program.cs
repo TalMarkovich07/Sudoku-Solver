@@ -14,17 +14,21 @@ namespace Sudoku_Solver
         {
             try
             {
-                RunTests tests = new RunTests();
-                tests.Run();
-                /*Solver solver = new Solver(Input);
+                /*RunTests tests = new RunTests();
+                tests.Run();*/
+                Solver solver = new Solver(Input);
                 solver.board.PrintBoard();
                 solver.Solve();
                 solver.board.PrintBoard();
-                Console.WriteLine($"{solver.SolveTimeMs} milliseconds");*/
+                Console.WriteLine($"{solver.SolveTimeMs} milliseconds");
             }
-            catch (Exception ex)
+            catch (SudokuExceptions ex)
             {
-                Console.WriteLine($"Sudoku exception: {ex}");
+                Console.WriteLine($"Sudoku exception: {ex.Message}");
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"System exception: {e.Message}");
             }
         }
     }

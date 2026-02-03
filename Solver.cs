@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Sudoku_Solver
 {
-    internal class Solver
+    public class Solver
     {
         public int iterations = 0;
         public SudokuBoard board;
@@ -26,7 +26,7 @@ namespace Sudoku_Solver
                 //Console.WriteLine($"Solved in: {watch.Elapsed.TotalMilliseconds}ms, and {iterations} iterations.");
             }
             else
-                throw new SudokuExceptions("Given board is un-solvable");
+                throw new UnsolvableBoardException();
         }
         private bool RecursionSolve()
         {
