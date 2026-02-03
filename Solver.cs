@@ -10,6 +10,7 @@ namespace Sudoku_Solver
     {
         public int iterations = 0;
         public SudokuBoard board;
+        public System.Diagnostics.Stopwatch watch;
         public long SolveTimeMs { get; private set; }
         public Solver(string input)
         {
@@ -17,7 +18,7 @@ namespace Sudoku_Solver
         }
         public void Solve()
         {
-            var watch = System.Diagnostics.Stopwatch.StartNew();
+            watch = System.Diagnostics.Stopwatch.StartNew();
             if (RecursionSolve())
             {
                 watch.Stop();
@@ -27,7 +28,36 @@ namespace Sudoku_Solver
             else
                 throw new SudokuExceptions("Given board is un-solvable");
         }
-        private void ProcessSingles(Queue<(int, int, int)> changesQ)
+        private bool RecursionSolve()
+        {
+            if (iterations % 10000 == 0)
+                if (watch.ElapsedMilliseconds > 999)
+                    return false;
+            iterations++;
+            Queue<(int, int, int)> localQ = new Queue<(int, int, int)>();
+            iterations++;
+            if (!ProcessSingles(localQ))
+            {
+                UndoQ(localQ);
+                return false;
+            }
+            (int row, int col, int mask) = MRV();
+            if (row == -1)
+                return true;
+            if (row == SudokuBoard.MatSize)
+                return false;
+            for (int i = 1; i <= SudokuBoard.MatSize; i++)
+                if ((mask & (1 << (i - 1))) != 0)
+                {
+                    UpdateSolver(row, col, i);
+                    if (RecursionSolve()) return true;
+                    UpdateSolver(row, col, 0, i);
+                }
+            UndoQ(localQ);
+            return false;
+
+        }
+        private bool ProcessSingles(Queue<(int, int, int)> changesQ)
         {
             bool changed = true;
             while (changed)
@@ -49,7 +79,7 @@ namespace Sudoku_Solver
                                 if (count == 0)
                                 {
                                     UndoQ(changesQ);
-                                    throw new SudokuExceptions();
+                                    return false;
                                 }
                                 if (count == 1)
                                 {
@@ -66,61 +96,41 @@ namespace Sudoku_Solver
 
                 if (HiddenSingles(changesQ)) changed = true;
             }
+            return true;
         }
-        private bool RecursionSolve()
+        
+        private (int, int, int) MRV()
+        //returns row, col, mask. if board is solved, all values are -1. if board is unsolvable, all values are MatSize
         {
-            Queue<(int, int, int)> localQ = new Queue<(int, int, int)> ();
-            try
-            {
-                ProcessSingles(localQ);
-            } catch (SudokuExceptions)
-            { return false; }
-            iterations++;
             int row = -1;
             int col = -1;
             int bestMask = 0;
             int minOptions = SudokuBoard.MatSize + 1;
 
-            // MRV
             for (int r = 0; r < SudokuBoard.MatSize; r++)
             {
                 for (int c = 0; c < SudokuBoard.MatSize; c++)
                 {
                     if (board.mat[r, c] == 0)
                     {
-                        int mask = board.valid.GetAvailableMask(r, c);
-                        int count = board.valid.CountOnes(mask);
+                        int mask = board.valid.GetAvailableMask(r, c); //gets the cell's mask
+                        int count = board.valid.CountOnes(mask); //count options in the cell
                         if (count == 0)
-                            return false;
-                        if (count < minOptions)
+                            return (SudokuBoard.MatSize, SudokuBoard.MatSize, SudokuBoard.MatSize); //backtrack
+                        if ((count < minOptions) || (count == minOptions && board.fails[r, c] > board.fails[row, col]))
                         {
+                            //change minOptions if there a less options, or if there are equal amount of options but more fails
                             minOptions = count;
                             row = r;
                             col = c;
                             bestMask = mask;
                         }
-                        if (minOptions == 1)
-                            break;
                     }
                 }
-                if (minOptions == 1)
-                    break;
             }
             if (row == -1)
-                return true;
-            for (int i = 1; i <= SudokuBoard.MatSize; i++)
-            {
-                if ((bestMask & (1 << (i - 1))) != 0)
-                {
-                    UpdateSolver(row, col, i);
-                    if (RecursionSolve()) return true;
-                    UpdateSolver(row, col, 0, i);
-                }
-            }
-            UndoQ(localQ);
-            board.fails[row, col]++;
-            return false;
-
+                return (-1, -1, -1); //no values left to fill
+            return (row, col, bestMask);
         }
         private void UndoQ(Queue<(int, int, int)> Q)
         {
@@ -144,8 +154,6 @@ namespace Sudoku_Solver
                 board.valid.UpdateValid(row, col, num);
             }
         }
-
-
         public bool NakedSingles()
         {
             bool changed = false;

@@ -9,7 +9,7 @@ namespace Sudoku_Solver
 
     internal class Program
     {
-        public static string Input = "000060080020000000001000000070000102500030000000000400004201000300700600000000050";
+        public static string Input = "000005080000601043000000000010500000000106000300000005530000061000000004000000000";
         static void Main(string[] args)
         {
             try
