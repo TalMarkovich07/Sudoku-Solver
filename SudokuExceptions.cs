@@ -1,0 +1,29 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Sudoku_Solver
+{
+    public class SudokuExceptions : Exception
+    {
+        public SudokuExceptions() { }
+
+        public SudokuExceptions(string message) : base(message) { }
+
+    }
+    public class GivenBoardIsWrongException : SudokuExceptions
+    {
+        public GivenBoardIsWrongException() : base("Given board is wrong") { }
+        public GivenBoardIsWrongException(string reason) : base($"Given board is wrong: {reason}") { }
+    }
+    public class UnsolvableBoardException : SudokuExceptions
+    {
+        public UnsolvableBoardException() : base("Given board is unsolvable") { }
+    }
+    public class WrongLengthException : SudokuExceptions 
+    {
+        public WrongLengthException() : base($"Board dimensions must be {SudokuBoard.MatSize}x{SudokuBoard.MatSize}!") { }   
+    }
+}
