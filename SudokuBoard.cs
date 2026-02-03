@@ -30,13 +30,21 @@ namespace Sudoku_Solver
         public SudokuBoard(string input) 
         {
             mat = new int[MatSize, MatSize];
-            fails = new int[MatSize, MatSize];
+            fails = new int[MatSize, MatSize]; // a matrix the size of mat to see how many times each cell failed
             if (input.Length != Math.Pow(MatSize, 2))
                 throw new WrongLengthException();
             for (int row = 0; row < MatSize; row++)
                 for (int col = 0; col < MatSize; col++)
                     mat[row, col] = CharToNum(input[MatSize*row + col]);
             this.valid = new Validation(mat);
+        }
+        public string BoardToString()
+        {
+            string str = "";
+            for (int row = 0; row < MatSize; row++)
+                for (int col = 0; col < MatSize; col++)
+                    str += mat[row, col].ToString();
+            return str;
         }
         public void PrintBoard()
         {

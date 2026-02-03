@@ -57,26 +57,16 @@ namespace Sudoku_Solver
                 return false;
             return true;
         }
-        
+
         public int CountOptions(int row, int col)
-        {
-            int boxIdx = (row / SudokuBoard.BoxSize) * SudokuBoard.BoxSize + (col / SudokuBoard.BoxSize);
-            int blocked = RowMasks[row] | ColMasks[col] | BoxMasks[boxIdx];
-            int fullMask = (1 << SudokuBoard.MatSize) - 1;
-            int available = ~blocked & fullMask;
-            int temp = available;
-            int count = 0;
-            while (temp > 0)
-            {
-                temp &= (temp - 1);
-                count++;
-            }
-            return count;
+        { // returns the amount of values options in a given cell
+            int available = GetAvailableMask(row, col);
+            return CountOnes(available);
         }
         public int GetAvailableMask(int row, int col) // returns a mask of the available numbers in given cell
         {
             int boxIdx = (row / SudokuBoard.BoxSize) * SudokuBoard.BoxSize + (col / SudokuBoard.BoxSize);
-            int blocked = RowMasks[row] | ColMasks[col] | BoxMasks[boxIdx];
+            int blocked = RowMasks[row] | ColMasks[col] | BoxMasks[boxIdx]; // a mask of all the values not possible in the cell
             int fullMask = (1 << SudokuBoard.MatSize) - 1;
             return ~blocked & fullMask;
         }
@@ -91,7 +81,7 @@ namespace Sudoku_Solver
             return count;
         }
         public void UpdateValid(int row, int col, int num)
-        {
+        { // includes num if the masks
             int mask = 1 << (num - 1);
             int boxIdx = (row / SudokuBoard.BoxSize) * SudokuBoard.BoxSize + (col / SudokuBoard.BoxSize);
             RowMasks[row] |= mask;
@@ -99,7 +89,7 @@ namespace Sudoku_Solver
             BoxMasks[boxIdx] |= mask;
         }
         public void ClearValid(int row, int col, int lastNum)
-        {
+        { //deletes lastNum from the masks
             int mask = 1 << (lastNum - 1);
             int boxIdx = (row / SudokuBoard.BoxSize) * SudokuBoard.BoxSize + (col / SudokuBoard.BoxSize);
 

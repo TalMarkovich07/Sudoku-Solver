@@ -9,27 +9,38 @@ namespace Sudoku_Solver
 
     internal class Program
     {
-        public static string Input = "000005080000601043000000000010500000000106000300000005530000061000000004000000000";
         static void Main(string[] args)
         {
-            try
+            Console.WriteLine("Welcome to Tal Markovich's Sudoku Solver!");
+            Console.WriteLine("This board will solve and valid, solvable board, in under a second.");
+            Console.WriteLine($"To start, enter a {Math.Pow(SudokuBoard.MatSize, 2)} long string to represent a {SudokuBoard.MatSize}x{SudokuBoard.MatSize} board.");
+            while (true) 
             {
-                /*RunTests tests = new RunTests();
-                tests.Run();*/
-                Solver solver = new Solver(Input);
-                solver.board.PrintBoard();
-                solver.Solve();
-                solver.board.PrintBoard();
-                Console.WriteLine($"{solver.SolveTimeMs} milliseconds");
+                try
+                {
+                    string input = Console.ReadLine();
+                    Solver solver = new Solver(input);
+                    solver.board.PrintBoard();
+                    solver.Solve();
+                    solver.board.PrintBoard();
+                    Console.WriteLine($"Board as a string: {solver.board.BoardToString()}");
+                    Console.WriteLine($"Board was solved in {(float)solver.SolveTimeMs / 1000} seconds");
+                }
+                catch (SudokuExceptions ex)
+                {
+                    Console.WriteLine($"Sudoku exception: {ex.Message}");
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine($"System exception: {e.Message}");
+                }
+                finally
+                {
+                    Console.WriteLine($"\n\n\nEnter another {Math.Pow(SudokuBoard.MatSize, 2)} long string to represent a {SudokuBoard.MatSize}x{SudokuBoard.MatSize} board.");
+                }
+
             }
-            catch (SudokuExceptions ex)
-            {
-                Console.WriteLine($"Sudoku exception: {ex.Message}");
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine($"System exception: {e.Message}");
-            }
+            
         }
     }
 }
