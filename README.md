@@ -14,11 +14,15 @@ neighboors (in his row/col/box), there is a value that only it can store. If one
 
 
 the program has 5 classes:
+
 Program.cs - output orders, inputs boards to solve, than outputs solved board or reason it wasn't solved. In a loop
 SudokuBoard.cs - represents a board. Handles going from string to board, board to string, and printing boards.
+
 Validation.cs - handles the bit-masking. contains the function to get a cell's mask, to go from 
 number to mask, mask to numer, and more.
+
 SudokuExceptions.cs - contains the sudoku exceptions.
+
 And the Solver.cs:
 The Solver.cs conatins the Solve() function, which starts the first call to the main function: RecursionSolve().
 RecursionSolve() is the back-tracking function. every call, it uses ProcessSingles() to fill all of the
