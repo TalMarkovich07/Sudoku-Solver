@@ -8,7 +8,7 @@ using System.Runtime.InteropServices;
 
 namespace Sudoku_Solver
 {
-    internal class Validation
+    public class Validation
     {
         private int[] RowMasks;
         private int[] ColMasks;
@@ -32,13 +32,13 @@ namespace Sudoku_Solver
                         int boxIdx = (row / boxSize) * boxSize + (col / boxSize);
 
                         if ((RowMasks[row] & mask) != 0)
-                            throw new SudokuExceptions($"Duplicate {val} in row {row}");
+                            throw new GivenBoardIsWrongException($"Duplicate {val} in row {row}");
 
                         if ((ColMasks[col] & mask) != 0)
-                            throw new SudokuExceptions($"Duplicate {val} in column {col}");
+                            throw new GivenBoardIsWrongException($"Duplicate {val} in column {col}");
 
                         if ((BoxMasks[boxIdx] & mask) != 0)
-                            throw new SudokuExceptions($"Duplicate {val} in box {boxIdx}");
+                            throw new GivenBoardIsWrongException($"Duplicate {val} in box {boxIdx}");
 
                         RowMasks[row] |= mask;
                         ColMasks[col] |= mask;

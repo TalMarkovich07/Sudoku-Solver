@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Sudoku_Solver
 {
-    internal class SudokuBoard
+    public class SudokuBoard
     {
         public static int MatSize = 9;
         public static int BoxSize = (int)Math.Sqrt(MatSize);
